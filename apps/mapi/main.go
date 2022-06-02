@@ -1,8 +1,8 @@
 package main
 
 import (
-	"api/libs/mcore"
 	"fmt"
+	"github.com/nx-go-playground/mcore"
 )
 
 func Hello(name string) string {

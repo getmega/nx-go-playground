@@ -1,8 +1,8 @@
 package main
 
 import (
-	"api/libs/core"
 	"fmt"
+	"github.com/nx-go-playground/core"
 	"log"
 	"net/http"
 	"os"
