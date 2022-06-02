@@ -1,13 +1,6 @@
 // @ts-check
 import { ProjectGraphBuilder, ProjectGraph, ProjectGraphProcessorContext } from '@nrwl/devkit';
 
-/**
- * Nx Project Graph plugin for go
- *
- * @param {import('@nrwl/devkit').ProjectGraph} graph
- * @param {import('@nrwl/devkit').ProjectGraphProcessorContext} context
- * @returns {import('@nrwl/devkit').ProjectGraph}
- */
 exports.processProjectGraph = (graph: ProjectGraph, context: ProjectGraphProcessorContext): ProjectGraph => {
   // This is an example so the `context` is not used for simplicity.
   // Let's take a look at some stuff that is included though.

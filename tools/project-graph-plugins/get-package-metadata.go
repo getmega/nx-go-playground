@@ -9,25 +9,23 @@ import (
 	"os/exec"
 )
 
-type replace struct {
-	Path  string `json:"Path"`
-	Dir   string `json:"Dir"`
-	GoMod string `json:"GoMod"`
+type module struct {
+	Path string `json:"Path"`
 }
 
 // Check https://golang.org/pkg/cmd/go/internal/list/ from available fields
 type pkg struct {
-	Path    string   `json:"Path"`
-	Main    bool     `json:"Main,omitempty"`
-	Dir     string   `json:"Dir"`
-	GoMod   string   `json:"GoMod"`
-	Replace *replace `json:"Replace,omitempty"`
+	Module      *module  `json:"Module,omitempty"`
+	ImportPath  string   `json:"ImportPath"`
+	Deps        []string `json:"Deps"`
+	GoFiles     []string `json:"GoFiles"`
+	TestGoFiles []string `json:"TestGoFiles"`
 }
 
-const workspaceGoModName = "github.com/nx-go-playground/demo"
+const workspaceGoModName = "getmega.com/nx-go-playground"
 
 func main() {
-	listOutput, err := exec.Command("go", "list", "-m", "-json", "all").Output()
+	listOutput, err := exec.Command("go", "list", "-json", "all").Output()
 	if err != nil {
 		log.Fatalf("failed fetching dependencies from go list: %v", err)
 	}

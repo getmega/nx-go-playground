@@ -1,3 +1,3 @@
-module github.com/nx-go-playground/mcore
+module getmega.com/nx-go-playground/mcore
 
 go 1.16

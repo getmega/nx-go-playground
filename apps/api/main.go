@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/nx-go-playground/core"
+	"getmega.com/nx-go-playground/core"
 	"log"
 	"net/http"
 	"os"

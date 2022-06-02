@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/nx-go-playground/mcore"
+	"getmega.com/nx-go-playground/mcore"
 )
 
 func Hello(name string) string {
