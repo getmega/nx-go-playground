@@ -1,7 +1,7 @@
 package main
 
 import (
-	"api/libs/core"
+	"getmega.com/libs/core"
 	"fmt"
 	"log"
 	"net/http"

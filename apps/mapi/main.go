@@ -1,7 +1,7 @@
 package main
 
 import (
-	"api/libs/mcore"
+	"getmega.com/libs/mcore"
 	"fmt"
 )
 
