@@ -2,6 +2,13 @@ const { ProjectGraphBuilder } = require('@nrwl/devkit');
 const { basename, extname, dirname } = require('path');
 const { execSync } = require('child_process');
 
+/**
+ * Nx Project Graph plugin for go
+ *
+ * @param {import('@nrwl/devkit').ProjectGraph} graph
+ * @param {import('@nrwl/devkit').ProjectGraphProcessorContext} context
+ * @returns {import('@nrwl/devkit').ProjectGraph}
+ */
 exports.processProjectGraph = (graph, context) => {
   const projectRootLookupMap = new Map()
   const projectRoots = []
@@ -10,20 +17,24 @@ exports.processProjectGraph = (graph, context) => {
     projectRoots.push(graph.nodes[projectName].data.root)
   }
 
-  console.log(projectRootLookupMap, projectRoots)
   const builder = new ProjectGraphBuilder(graph)
-  // Define dependencies using the context of files that were changed to minimize work
-  // between each run.
+  // Define dependencies using the context of files that were changed to minimize work between each run.
   for (const projectName in context.filesToProcess) {
-    context.filesToProcess[projectName]
-      .filter((f) => extname(f.file) === '.go')
-      .map(({ file }) => ({ projectName, file, dependencies: getGoDependencies(projectRootLookupMap, projectRoots, file) }))
-      .filter((data) => data.dependencies && data.dependencies.length > 0)
-      .forEach(({ projectName, file, dependencies }) => {
-        for (const dependency of dependencies) {
-          builder.addExplicitDependency(projectName, file, dependency)
-        }
-      })
+    const files = context.filesToProcess[projectName]
+    for (const f of files) {
+      if (extname(f.file) !== '.go') {
+        continue
+      }
+
+      const dependencies = getGoDependencies(projectRootLookupMap, projectRoots, f.file)
+      if (!dependencies?.length) {
+        continue
+      }
+
+      for (const dependency of dependencies) {
+        builder.addExplicitDependency(projectName, f.file, dependency)
+      }
+    }
   }
 
   return builder.getUpdatedProjectGraph()
@@ -31,10 +42,10 @@ exports.processProjectGraph = (graph, context) => {
 
 /**
  * getGoDependencies will use `go list` to get dependency information from a go file
- * @param projectRootLookup
- * @param projectRoots
- * @param file
- * @returns
+ * @param {Map} projectRootLookup
+ * @param {string[]} projectRoots
+ * @param {string} file
+ * @returns {string[]}
  */
 const getGoDependencies = (projectRootLookup, projectRoots, file) => {
   const goPackageDataJson = execSync('go list -json ./' + dirname(file), { encoding: 'utf-8' })
