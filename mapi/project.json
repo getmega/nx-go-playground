@@ -1,19 +1,19 @@
 {
-  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "$schema": "../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
-  "sourceRoot": "apps/mapi",
+  "sourceRoot": "mapi",
   "targets": {
     "build": {
       "executor": "@nx-go/nx-go:build",
       "options": {
-        "outputPath": "dist/apps/mapi",
-        "main": "apps/mapi/main.go"
+        "outputPath": "dist/mapi",
+        "main": "mapi/main.go"
       }
     },
     "serve": {
       "executor": "@nx-go/nx-go:serve",
       "options": {
-        "main": "apps/mapi/main.go"
+        "main": "mapi/main.go"
       }
     },
     "test": {

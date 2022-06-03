@@ -1,6 +1,8 @@
-const { ProjectGraphBuilder } = require('@nrwl/devkit');
-const { basename, extname, dirname } = require('path');
-const { execSync } = require('child_process');
+const {ProjectGraphBuilder} = require('@nrwl/devkit');
+const {basename, extname} = require('path');
+const {execSync} = require('child_process');
+
+const workspaceModuleRoot = "getmega.com"
 
 /**
  * Nx Project Graph plugin for go
@@ -48,7 +50,7 @@ exports.processProjectGraph = (graph, context) => {
  * @returns {string[]}
  */
 const getGoDependencies = (projectRootLookup, projectRoots, file) => {
-  const goPackageDataJson = execSync('go list -json ./' + dirname(file), { encoding: 'utf-8' })
+  const goPackageDataJson = execSync('go list -json ./' + file, {encoding: 'utf-8'})
   const goPackage = JSON.parse(goPackageDataJson)
   const isTestFile = basename(file, '.go').endsWith('_test')
 
@@ -57,11 +59,11 @@ const getGoDependencies = (projectRootLookup, projectRoots, file) => {
 
   const dependentProjects = new Set()
   for (const d of listOfImports) {
-    if (!d.startsWith(goPackage.Module.Path)) {
+    if (!d.startsWith(workspaceModuleRoot)) {
       continue
     }
 
-    const rootDir = d.substring(goPackage.Module.Path.length + 1)
+    const rootDir = d.substring(workspaceModuleRoot.length + 1)
     const projectRoot = projectRoots.find(projectRoot => rootDir.startsWith(projectRoot))
     const projectName = projectRootLookup.get(projectRoot)
     dependentProjects.add(projectName)
