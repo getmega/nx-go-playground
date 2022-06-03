@@ -43,6 +43,11 @@ exports.processProjectGraph = (graph, context) => {
 }
 
 /**
+ * A number, or a string containing a number.
+ * @typedef { {Deps?: string[], Module: {Path: string}, Imports?: string[], TestImports?: string[]} } GoPackage
+ */
+
+/**
  * getGoDependencies will use `go list` to get dependency information from a go file
  * @param {Map} projectRootLookup
  * @param {string[]} projectRoots
@@ -51,6 +56,7 @@ exports.processProjectGraph = (graph, context) => {
  */
 const getGoDependencies = (projectRootLookup, projectRoots, file) => {
   const goPackageDataJson = execSync('go list -json ./' + file, {encoding: 'utf-8'})
+  /** @type {GoPackage} */
   const goPackage = JSON.parse(goPackageDataJson)
   const isTestFile = basename(file, '.go').endsWith('_test')
 
@@ -71,15 +77,3 @@ const getGoDependencies = (projectRootLookup, projectRoots, file) => {
 
   return [...dependentProjects]
 }
-
-/**
- * GoPackage shape
- */
-// interface GoPackage {
-//   Deps?: string[]
-//   Module: {
-//     Path: string
-//   }
-//   Imports?: string[]
-//   TestImports?: string[]
-// }
