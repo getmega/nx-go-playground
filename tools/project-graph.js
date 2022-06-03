@@ -29,7 +29,7 @@ exports.processProjectGraph = (graph, context) => {
       }
 
       const dependencies = getGoDependencies(projectRootLookupMap, projectRoots, f.file)
-      if (!dependencies?.length) {
+      if (!dependencies || dependencies.length === 0) {
         continue
       }
 
@@ -58,10 +58,19 @@ const getGoDependencies = (projectRootLookup, projectRoots, file) => {
   const goPackageDataJson = execSync('go list -json ./' + file, {encoding: 'utf-8'})
   /** @type {GoPackage} */
   const goPackage = JSON.parse(goPackageDataJson)
-  const isTestFile = basename(file, '.go').endsWith('_test')
 
   // Use the correct imports list depending on if the file is a test file.
-  const listOfImports = (!isTestFile ? goPackage.Imports : goPackage.TestImports) ?? []
+  let listOfImports
+  const isTestFile = basename(file, '.go').endsWith('_test')
+  if (isTestFile) {
+    listOfImports = goPackage.TestImports
+  } else {
+    listOfImports = goPackage.Imports
+  }
+
+  if (!listOfImports) {
+    listOfImports = []
+  }
 
   const dependentProjects = new Set()
   for (const d of listOfImports) {
