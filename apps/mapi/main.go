@@ -1,12 +1,13 @@
 package main
 
 import (
-	"getmega.com/libs/mcore"
 	"fmt"
+	"getmega.com/libs/core/bar"
+	"getmega.com/libs/mcore"
 )
 
 func Hello(name string) string {
-	result := "Hello " + mcore.Mcore(name)
+	result := "Helsdldlo " + mcore.Mcore(name) + bar.GetName()
 	return result
 }
 

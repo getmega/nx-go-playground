@@ -1,8 +1,9 @@
 package main
 
 import (
-	"getmega.com/libs/core"
 	"fmt"
+	"getmega.com/libs/core"
+	"getmega.com/libs/core/foo"
 	"log"
 	"net/http"
 	"os"
@@ -10,7 +11,7 @@ import (
 
 // Hello returns hello with the name you pass in :)
 func Hello(name string) string {
-	result := "Hello " + name
+	result := "Hello " + name + foo.GetName()
 	fmt.Println(result)
 	return result
 }
