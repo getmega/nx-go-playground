@@ -5,7 +5,6 @@ const { execSync } = require('child_process')
 const workspaceModuleRoot = 'getmega.com'
 
 /**
- * A number, or a string containing a number.
  * @typedef { {Imports?: string[] } } GoListData
  */
 
