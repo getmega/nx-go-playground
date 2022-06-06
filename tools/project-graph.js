@@ -58,7 +58,8 @@ const buildDependenciesUsingPackages = (context, builder, projectRoots, projectR
   for (const projectName in goPackages) {
     const packagesToProcess = goPackages[projectName]
     for (const goPackage of packagesToProcess) {
-      const dependencies = getPackageDependencies(goPackage, projectName, projectRoots, projectRootLookup)
+      const imports = getImportsOfPackage(goPackage)
+      const dependencies = getDependenciesFromImports(imports, projectName, projectRoots, projectRootLookup)
       if (!dependencies || dependencies.length === 0) {
         continue
       }
@@ -86,7 +87,8 @@ const buildDependenciesUsingFiles = (context, builder, projectRoots, projectRoot
         continue
       }
 
-      const dependencies = getFileDependencies(f.file, projectName, projectRoots, projectRootLookup)
+      const imports = getImportsOfFile(f.file)
+      const dependencies = getDependenciesFromImports(imports, projectName, projectRoots, projectRootLookup)
       if (!dependencies || dependencies.length === 0) {
         continue
       }
@@ -160,30 +162,4 @@ const getDependenciesFromImports = (imports, selfProject, projectRoots, projectR
   }
 
   return [...dependentProjects]
-}
-
-/**
- * getPackageDependencies will use `go list` to get dependency information from a go package
- * @param {string} goPackage
- * @param {string} selfProject
- * @param {string[]} projectRoots
- * @param {Map<string, string>} projectRootLookup
- * @returns {string[]}
- */
-const getPackageDependencies = (goPackage, selfProject, projectRoots, projectRootLookup) => {
-  const imports = getImportsOfPackage(goPackage)
-  return getDependenciesFromImports(imports, selfProject, projectRoots, projectRootLookup)
-}
-
-/**
- * getFileDependencies will use `go list` to get dependency information from a go file
- * @param {string} file
- * @param {string} selfProject
- * @param {string[]} projectRoots
- * @param {Map<string, string>} projectRootLookup
- * @returns {string[]}
- */
-const getFileDependencies = (file, selfProject, projectRoots, projectRootLookup) => {
-  const imports = getImportsOfFile(file)
-  return getDependenciesFromImports(imports, selfProject, projectRoots, projectRootLookup)
 }
