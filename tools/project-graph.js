@@ -1,8 +1,8 @@
-const {ProjectGraphBuilder} = require('@nrwl/devkit');
-const {basename, extname} = require('path');
-const {execSync} = require('child_process');
+const { ProjectGraphBuilder } = require('@nrwl/devkit')
+const { basename, extname, dirname } = require('path')
+const { execSync } = require('child_process')
 
-const workspaceModuleRoot = "getmega.com"
+const workspaceModuleRoot = 'getmega.com'
 
 /**
  * Nx Project Graph plugin for go
@@ -28,7 +28,12 @@ exports.processProjectGraph = (graph, context) => {
         continue
       }
 
-      const dependencies = getGoDependencies(projectRootLookupMap, projectRoots, f.file)
+      const dependencies = getGoDependencies(
+        projectName,
+        projectRootLookupMap,
+        projectRoots,
+        f.file
+      )
       if (!dependencies || dependencies.length === 0) {
         continue
       }
@@ -44,33 +49,37 @@ exports.processProjectGraph = (graph, context) => {
 
 /**
  * A number, or a string containing a number.
- * @typedef { {Deps?: string[], Module: {Path: string}, Imports?: string[], TestImports?: string[]} } GoPackage
+ * @typedef { {Imports?: string[] } } GoPackage
  */
 
 /**
  * getGoDependencies will use `go list` to get dependency information from a go file
+ * @param {string} selfProject
  * @param {Map} projectRootLookup
  * @param {string[]} projectRoots
  * @param {string} file
  * @returns {string[]}
  */
-const getGoDependencies = (projectRootLookup, projectRoots, file) => {
-  const goPackageDataJson = execSync('go list -json ./' + file, {encoding: 'utf-8'})
+const getGoDependencies = (
+  selfProject,
+  projectRootLookup,
+  projectRoots,
+  file
+) => {
+  // Use the correct imports list depending on if the file is a test file.
+  const isTestFile = basename(file, '.go').endsWith('_test')
+  let formatter = `{ "Imports": [{{ range $i, $e := .Imports }}{{ if $i }},{{ end }}"{{ $e }}"{{ end }}] }`
+  if (isTestFile) {
+    formatter = `{ "Imports": [{{ range $i, $e := .TestImports }}{{ if $i }},{{ end }}"{{ $e }}"{{ end }}] }`
+  }
+
+  const goPackageDataJson = execSync(`go list -f '${formatter}' ./${file}`, {
+    encoding: 'utf-8',
+  })
   /** @type {GoPackage} */
   const goPackage = JSON.parse(goPackageDataJson)
 
-  // Use the correct imports list depending on if the file is a test file.
-  let listOfImports
-  const isTestFile = basename(file, '.go').endsWith('_test')
-  if (isTestFile) {
-    listOfImports = goPackage.TestImports
-  } else {
-    listOfImports = goPackage.Imports
-  }
-
-  if (!listOfImports) {
-    listOfImports = []
-  }
+  const listOfImports = goPackage.Imports || []
 
   const dependentProjects = new Set()
   for (const d of listOfImports) {
@@ -79,9 +88,13 @@ const getGoDependencies = (projectRootLookup, projectRoots, file) => {
     }
 
     const rootDir = d.substring(workspaceModuleRoot.length + 1)
-    const projectRoot = projectRoots.find(projectRoot => rootDir.startsWith(projectRoot))
+    const projectRoot = projectRoots.find(projectRoot =>
+      rootDir.startsWith(projectRoot)
+    )
     const projectName = projectRootLookup.get(projectRoot)
-    dependentProjects.add(projectName)
+    if (projectName && projectName !== selfProject) {
+      dependentProjects.add(projectName)
+    }
   }
 
   return [...dependentProjects]
