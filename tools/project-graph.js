@@ -106,7 +106,7 @@ const buildDependenciesUsingFiles = (context, builder, projectRoots, projectRoot
  */
 const getImportsOfPackage = (goPackage) => {
   const formatter = `{ "Imports": [{{ range $i, $e := .Imports }}{{ if $i }},{{ end }}"{{ $e }}"{{ end }}] }`
-  const goPackageDataJson = execSync(`go list -f '${formatter}' ./${goPackage}`, {
+  const goPackageDataJson = execSync(`cd ${goPackage} && go list -f '${formatter}' .`, {
     encoding: 'utf-8',
   })
   /** @type {GoPackage} */
