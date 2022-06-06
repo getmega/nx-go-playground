@@ -6,7 +6,7 @@ const workspaceModuleRoot = 'getmega.com'
 
 /**
  * A number, or a string containing a number.
- * @typedef { {Imports?: string[] } } GoPackage
+ * @typedef { {Imports?: string[] } } GoListData
  */
 
 /**
@@ -106,13 +106,13 @@ const buildDependenciesUsingFiles = (context, builder, projectRoots, projectRoot
  */
 const getImportsOfPackage = (goPackage) => {
   const formatter = `{ "Imports": [{{ range $i, $e := .Imports }}{{ if $i }},{{ end }}"{{ $e }}"{{ end }}] }`
-  const goPackageDataJson = execSync(`cd ${goPackage} && go list -f '${formatter}' .`, {
+  const goListDataJson = execSync(`cd ${goPackage} && go list -f '${formatter}' .`, {
     encoding: 'utf-8',
   })
-  /** @type {GoPackage} */
-  const goPackageData = JSON.parse(goPackageDataJson)
+  /** @type {GoListData} */
+  const goListData = JSON.parse(goListDataJson)
 
-  return goPackageData.Imports || []
+  return goListData.Imports || []
 }
 
 /**
@@ -128,13 +128,13 @@ const getImportsOfFile = (file) => {
     formatter = `{ "Imports": [{{ range $i, $e := .TestImports }}{{ if $i }},{{ end }}"{{ $e }}"{{ end }}] }`
   }
 
-  const goPackageDataJson = execSync(`go list -f '${formatter}' ./${file}`, {
+  const goListDataJson = execSync(`go list -f '${formatter}' ./${file}`, {
     encoding: 'utf-8',
   })
-  /** @type {GoPackage} */
-  const goPackageData = JSON.parse(goPackageDataJson)
+  /** @type {GoListData} */
+  const goListData = JSON.parse(goListDataJson)
 
-  return goPackageData.Imports || []
+  return goListData.Imports || []
 }
 
 /**
